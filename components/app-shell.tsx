@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { ReactNode } from "react";
 
 import { logoutAction } from "@/app/actions";
@@ -8,19 +9,22 @@ export function AppShell({
   session,
   title,
   subtitle,
-  children
+  children,
 }: {
   session: SessionPayload;
   title: string;
   subtitle: string;
   children: ReactNode;
 }) {
-  const links = [
+  const baseLinks: Array<{ href: Route; label: string }> = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/events", label: "Events" },
     { href: "/students", label: "Students" },
-    ...(session.role === "SUPER_ADMIN" ? [{ href: "/admins", label: "Admins" }] : [])
   ];
+  const links: Array<{ href: Route; label: string }> =
+    session.role === "SUPER_ADMIN"
+      ? [...baseLinks, { href: "/admins" as Route, label: "Admins" }]
+      : baseLinks;
 
   return (
     <div className="shell">
@@ -28,7 +32,9 @@ export function AppShell({
         <div>
           <p className="eyebrow">Mozilla Firefox Club</p>
           <h1>EXC Tracker</h1>
-          <p className="muted">Attendance and hour completion for club-run EXC courses.</p>
+          <p className="muted">
+            Attendance and hour completion for club-run EXC courses.
+          </p>
         </div>
 
         <nav className="nav">
@@ -42,7 +48,9 @@ export function AppShell({
         <div className="profile-card">
           <div>
             <p className="profile-name">{session.name}</p>
-            <p className="muted">{session.role === "SUPER_ADMIN" ? "Super Admin" : "Admin"}</p>
+            <p className="muted">
+              {session.role === "SUPER_ADMIN" ? "Super Admin" : "Admin"}
+            </p>
           </div>
           <form action={logoutAction}>
             <button className="ghost-button" type="submit">
